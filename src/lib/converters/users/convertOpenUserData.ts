@@ -1,5 +1,5 @@
-import { User } from '../../../DataTypes/Data/User/User';
-import { UserOpenData } from '../../../DataTypes/Data/User/UserOpenData';
+import { User } from '../../../DataTypes/User/User.D';
+import { UserOpenData } from '../../../DataTypes/User/User.D';
 
 const convertOpenUserData = (user: User): UserOpenData => {
 	return {

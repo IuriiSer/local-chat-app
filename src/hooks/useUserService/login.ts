@@ -1,22 +1,16 @@
-import getDataFromLocalStorage from '../../lib/getters/getDataFromStorage/getDataFromStorage';
-import { isUsersInStorage, UsersInStorage } from '../../DataTypes/Data/User/Users';
-import { LoginI, LoginR, LoginStatus } from '../../DataTypes/App/hooks/useUserService/Login';
+import { LoginI, LoginR, LoginStatus } from './login.D';
+import { isUser } from '../../DataTypes/User/User.D';
+import getUsers from '../../lib/interfaces/users/getUsers';
 
 const login = ({ login, password }: LoginI): LoginR => {
-	const { dataInStorage, writeDataInStorage, eraseDataInStorage } =
-		getDataFromLocalStorage<UsersInStorage>({ fieldName: 'users' });
+	const query = { userLogin: login };
+	const user = getUsers({ query });
 
-	const users = dataInStorage;
+	if (!user) return { status: LoginStatus.wrongLoginOrPassword };
+	if (!isUser(user, ['password'])) return { status: LoginStatus.wrongLoginOrPassword };
+	if (user.password !== password) return { status: LoginStatus.wrongLoginOrPassword };
 
-	if (!isUsersInStorage(users) || !users) {
-		eraseDataInStorage();
-		writeDataInStorage({ newData: {} });
-		return { status: LoginStatus.wrongLoginOrPassword };
-	}
-
-	const userToValidate = Object.values(users).find((el) => {});
-
-	return { status: LoginStatus.ok };
+	return { status: LoginStatus.ok, user };
 };
 
 export default login;
