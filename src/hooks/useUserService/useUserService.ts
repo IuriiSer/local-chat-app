@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { NewUser, User } from '../../DataTypes/User/User.D';
+import { NewUser, User, UserDataToUpdate } from '../../DataTypes/User/User.D';
 import Interfaces from '../../lib/interfaces';
 import loginPrototype from './login';
 import signinPrototype from './signin';
+import updatePrototype from './update';
 import {
   UserServiceMessage,
   UserServiceResponce,
@@ -23,7 +24,11 @@ const useUserService = (): UseUserService => {
     return tryToSignin(newUser);
   };
 
-  const update = () => {};
+	const tryToUpdate= updatePrototype(UserInterface.updateUserData, setUser)
+	const update = (newData: UserDataToUpdate) => {
+    if (!user) return { status: UserServiceStatus.error, message: UserServiceMessage.notAuth };
+    return tryToUpdate(user, newData);
+  };
 
   return { update, signin, login, logout, authorizedUser: user };
 };
