@@ -1,4 +1,4 @@
-import { version as uuidVersion, validate as uuidValidate, validate } from 'uuid';
+import { version as uuidVersion, validate as uuidValidate } from 'uuid';
 import { ChatID } from '../Chat/Chat.D';
 import { DataFormatError } from '../Errors.D';
 
