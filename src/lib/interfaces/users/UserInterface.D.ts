@@ -1,4 +1,4 @@
-import { User, NewUser, UserNewData } from '../../../DataTypes/User/User.D';
+import { User, NewUser, UserFieldError } from '../../../DataTypes/User/User.D';
 import { GetUsersI, GetUsersR } from './lib/getUsers.D';
 
 // UserInterface Prototype
@@ -6,8 +6,8 @@ import { GetUsersI, GetUsersR } from './lib/getUsers.D';
 export abstract class UserInterfacePrototype {
 	abstract getUsers({ query }: GetUsersI): GetUsersR;
 		// get user/s by differnet query
-	abstract addNewUser({ newUser }: { newUser: NewUser }): User;
+	abstract addNewUser({ newUser }: { newUser: NewUser }): User | UserFieldError[];
 		// add new user to the storage
-	abstract updateUserData({ newUserData }: { newUserData: UserNewData }): User;
+	abstract updateUserData({ user }: { user: User }): User | UserFieldError[];
 		// update the user by his id
 }

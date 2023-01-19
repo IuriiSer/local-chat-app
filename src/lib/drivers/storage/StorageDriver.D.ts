@@ -11,7 +11,7 @@ export type StorageDriverR<T> = {
 		// method that write data in storage in saved field
 	eraseDataInStorage(): void;
 		// method that erase all storage in saved field
-	addDataInStorage({ newData }: DataInStorageI<T>): void;
+	addDataInStorage: AddDataInStorage<T>;
 		// pull data to the storage in saved field
 	getDataInStorage: GetDataInStorage<T>;
 		// get all data from storage throw JSON.parse(rawData)
