@@ -14,6 +14,7 @@ export enum UserServiceMessage {
   error = 'error',
   wrongInput = 'wrongInput',
   alreadyAuth = 'you are already authorized',
+  notAuth = 'you are not authorized',
 }
 
 export type UserServiceResponce = ServiceResponce<
