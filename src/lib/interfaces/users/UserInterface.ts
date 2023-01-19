@@ -1,17 +1,24 @@
 import { UserInterfacePrototype } from './UserInterface.D';
-import { User, NewUser, UserNewData, UsersInStorage } from '../../../DataTypes/User/User.D';
+import {
+	User,
+	NewUser,
+	UsersInStorage,
+	isNewUser,
+	UserFieldError,
+} from '../../../DataTypes/User/User.D';
 import convertOpenUserData from '../../converters/users/convertOpenUserData';
 import validateUsersStorage from '../../validators/validateUsersStorage';
 import Drivers from '../../drivers';
 import { StorageDriverR } from '../../drivers/storage/StorageDriver.D';
 import {
-  isQueryByLogin,
+	isQueryByLogin,
 	isQueryByIDs,
 	isQueryByNickName,
 	GetUsersR,
 	GetUsersI,
 } from './lib/getUsers.D';
 import queryBy from './lib';
+import { v4 as uuidv4 } from 'uuid';
 
 class UserInterface extends UserInterfacePrototype {
 	private storageDriver: StorageDriverR<UsersInStorage>;
@@ -21,12 +28,15 @@ class UserInterface extends UserInterfacePrototype {
 		this.storageDriver = Drivers.storage.driver({ fieldName: 'users' });
 	}
 
-	getUsers({ query }: GetUsersI): GetUsersR {
-		const dataInStorage = this.storageDriver.getDataInStorage();
-		const users = validateUsersStorage({
-			users: dataInStorage,
+	private getAllUsers(): UsersInStorage {
+		return validateUsersStorage({
+			users: this.storageDriver.getDataInStorage(),
 			writeDataInStorage: this.storageDriver.writeDataInStorage,
 		});
+	}
+
+	getUsers({ query }: GetUsersI): GetUsersR {
+		const users = this.getAllUsers();
 
 		if (isQueryByLogin(query))
 			return queryBy.login({ users: Object.values(users), userLogin: query.userLogin });
@@ -45,8 +55,29 @@ class UserInterface extends UserInterfacePrototype {
 		return null;
 	}
 
-  addNewUser({ newUser }: { newUser: NewUser }): User {}
-  updateUserData({ newUserData }: { newUserData: UserNewData }): User {}
+	addNewUser({ newUser }: { newUser: NewUser }): User | UserFieldError[] {
+		const user = {
+			_id: uuidv4(),
+			chats: [],
+			...newUser,
+		} as User;
+
+		const errs = isNewUser(user);
+		if (errs) return errs;
+
+		this.storageDriver.addDataInStorage({ newData: { [user._id]: user } });
+
+		return user;
+	}
+
+	updateUserData({ user }: { user: User }): User | UserFieldError[] {
+		const errs = isNewUser(user); // use same validator
+		if (errs) return errs;
+
+		this.storageDriver.addDataInStorage({ newData: { [user._id]: user } });
+
+		return user;
+	}
 }
 
 const userInterface = new UserInterface();
