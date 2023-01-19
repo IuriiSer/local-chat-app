@@ -28,6 +28,9 @@ export type User = {
 export type NewUser = Omit<User, '_id' | 'chats'>;
 // data to create new user
 
+export type UserDataToUpdate = Partial<Omit<User, '_id' | 'chats'>>;
+// in this case UserDataToUpdate is same with NewUser but patrial
+
 export type UserOpenData = Omit<User, 'password' | 'chats' | 'session' | 'login'>;
 // open user data that can be showed in front
 
@@ -140,7 +143,7 @@ const getFieldValidator = (name: string): UserFieldValidator | null => {
 	return userFieldValidators.find((validator) => validator.name === name) || null;
 };
 
-export const isNewUser = (newUser: User): UserFieldError[] | null => {
+export const isTrueFormatUser = (newUser: User): UserFieldError[] | null => {
 	const dataErrors = [] as UserFieldError[];
 	userFieldValidators.forEach(({ validate }) => {
 		const err = validate(newUser);
