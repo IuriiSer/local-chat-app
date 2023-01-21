@@ -19,7 +19,7 @@ export interface GetUsersI {
 	query: GetUsersQuery;
 }
 
-export type GetUsersR = User | UserOpenData[] | UserOpenData | null;
+export type GetUsersR = User | User[] | null;
 	// types that can return method in UserInterface
 
 
