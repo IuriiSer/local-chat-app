@@ -11,9 +11,6 @@ export type Chat = {
   messages: MessageID[];
   // Hold all messages IDs that sent in the chat
   owner: UserID;
-  // The owner of chat
-  managers: UserID[];
-  // Users who can approve new applications to join the chat
 };
 
 export type ChatsCache = {
