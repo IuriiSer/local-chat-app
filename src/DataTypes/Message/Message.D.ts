@@ -18,9 +18,9 @@ export type Message = {
 		// the user ID who sent the message
 	reactions: MessageReaction[];
 		// all reactions for the message
-	isModified: Boolean;
+	isModified: boolean;
 		// shows do the message was modified
-	isHided: Boolean;
+	isHided: boolean;
 		// shows did message deleted (hided)
 	sentDate: Date;
 		// sent date
