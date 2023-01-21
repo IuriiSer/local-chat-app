@@ -1,25 +1,17 @@
 import React from 'react';
-import useUser from './hooks/useUserService/useUserService';
+import Authorization from './components/Authorization/Authorization';
+import useChatService from './hooks/useChatService/useChatService';
+import useUserService from './hooks/useUserService/useUserService';
 
 function App() {
-	useUser();
+  const { update, signup, signin, logout, authorizedUser, getUsers } = useUserService();
+  useChatService(authorizedUser);
 
-	return (
-		<div className='App'>
-			<header className='App-header'>
-				<p>
-					Edit <code>src/App.tsx</code> and save to reload.
-				</p>
-				<a
-					className='App-link'
-					href='https://reactjs.org'
-					target='_blank'
-					rel='noopener noreferrer'>
-					Learn React
-				</a>
-			</header>
-		</div>
-	);
+  return (
+    <>
+      <Authorization signup={signup} signin={signin} isAuthorizate={!!authorizedUser} />
+    </>
+  );
 }
 
 export default App;
