@@ -13,6 +13,8 @@ export type Chat = {
   owner: UserID;
 };
 
+export type ChatInStorage = ChatsCache
+
 export type ChatsCache = {
   [key: ChatID]: Chat;
 };
