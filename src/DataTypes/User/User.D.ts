@@ -83,6 +83,9 @@ export enum UserFieldsErrorDescription {
   shortPassword = 'Password should have atleast 6 symbols',
   passwordDontIncludeSpecSymbols = 'Password should have spec symbols',
   passwordIsNotSame = 'Passwords shoul be equal',
+  wrongSigninPassword = 'Wrong password',
+  wrongSigninLogin = 'User with the login doesn`t exist',
+  shortNickName = 'Nickname should be longer. Minimun 4 symbols'
 }
 
 export type UserFieldError = DataFormatError<UserFieldsErrorDescription>;
@@ -124,6 +127,7 @@ const userFieldValidators: UserFieldValidator[] = [
       const { nickName } = user;
       const field = 'nickName';
       if (!nickName) return { field, err: UserFieldsErrorDescription.emptyNickName };
+      if (nickName.length < 4) return { field, err: UserFieldsErrorDescription.shortNickName };
       const regex = /^([a-z0-9]+|(.[a-z0-9])+){1,}$/;
       if (!regex.test(nickName)) return { field, err: UserFieldsErrorDescription.wrongNickName };
       return null;
@@ -148,10 +152,34 @@ const getFieldValidator = (name: string): UserFieldValidator | null => {
   return userFieldValidators.find((validator) => validator.name === name) || null;
 };
 
+export const getFieldValidators = (names: string[]): UserFieldValidator[] | null => {
+  const validators = {} as { [validatorName: string]: UserFieldValidator };
+  userFieldValidators.forEach((validator) => {
+    validators[validator.name] = validator;
+  });
+  const res = names.map((name) => validators[name] || null).filter((validator) => !!validator);
+  if (!res.length) return null;
+  return res;
+};
+
 export const isTrueFormatUser = (newUser: User): UserFieldError[] | null => {
   const dataErrors = [] as UserFieldError[];
   userFieldValidators.forEach(({ validate }) => {
     const err = validate(newUser);
+    if (!err) return;
+    dataErrors.push(err);
+  });
+  if (dataErrors.length) return dataErrors;
+  return null;
+};
+
+export const isCustomTrue = (
+  user: User,
+  validators: UserFieldValidator[],
+): UserFieldError[] | null => {
+  const dataErrors = [] as UserFieldError[];
+  validators.forEach(({ validate }) => {
+    const err = validate(user);
     if (!err) return;
     dataErrors.push(err);
   });
