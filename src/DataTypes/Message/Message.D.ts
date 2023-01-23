@@ -16,11 +16,11 @@ export type Message = {
 		// the message data -> text, photos, etc
 	owner: UserID;
 		// the user ID who sent the message
-	reactions: MessageReaction[];
+	reactions?: MessageReaction[];
 		// all reactions for the message
-	isModified: boolean;
+	isModified?: boolean;
 		// shows do the message was modified
-	isHided: boolean;
+	isHided?: boolean;
 		// shows did message deleted (hided)
 	sentDate: Date;
 		// sent date
