@@ -10,8 +10,3 @@ export interface LoginI {
   login: UserLogin;
   password: UserPassword;
 }
-
-export type LoginR = {
-  status: LoginStatus;
-  user?: User;
-};

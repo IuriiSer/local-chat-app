@@ -7,7 +7,7 @@ import {
   UserOpenData,
 } from '../../DataTypes/User/User.D';
 import { GetUsersI } from '../../lib/interfaces/users/lib/getUsers.D';
-import { LoginI, LoginR } from './signinPrototype.D';
+import { LoginI } from './signinPrototype.D';
 
 export type Logout = () => void;
 
