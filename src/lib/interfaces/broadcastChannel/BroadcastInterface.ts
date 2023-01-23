@@ -1,29 +1,41 @@
-import { UserChat } from '../../../DataTypes/User/User.D';
 import {
+  BroadcastAnyMessage,
   BroadcastInterface,
   BroadcastSubscriber,
-  BroadcastSubscriberName,
+  isBroadcastAnyMessage,
+  Subscribers,
+  UnsubscribeI,
 } from './BroadcastInterface.D';
 
-const BroadcastInterfacePrototype = (channel: string, chats: UserChat[]): BroadcastInterface => {
+const BroadcastInterfacePrototype = (channel: string): BroadcastInterface => {
   const bc = new BroadcastChannel(channel);
-  let subscribers = [] as BroadcastSubscriber[] | null;
+  let subscribers = {
+    forRecieving: [],
+    forSending: [],
+  } as Subscribers | null;
 
-  bc.onmessage = ({ data }) => {
+  bc.onmessage = ({ data }: MessageEvent<BroadcastAnyMessage>) => {
     if (!subscribers) return null;
-    subscribers.forEach((subscriber) => {
-      subscriber.action(data);
-    });
+    if (isBroadcastAnyMessage(data))
+      subscribers.forRecieving.forEach((sudcriber) => {
+        sudcriber.action(data);
+      });
   };
 
   const subscribe = (subscriber: BroadcastSubscriber): void => {
     if (!subscribers) return;
-    subscribers.push(subscriber);
+    if (subscriber.actionType === 'recieve') subscribers.forRecieving.push(subscriber);
+    if (subscriber.actionType === 'send') subscribers.forSending.push(subscriber);
   };
 
-  const unsubscribe = (subscriberName: BroadcastSubscriberName): void => {
+  const unsubscribe = ({ idToUnsubscribe, actionType }: UnsubscribeI): void => {
     if (!subscribers) return;
-    subscribers = subscribers.filter((sub) => sub.name !== subscriberName);
+    if (actionType === 'recieve')
+      subscribers.forRecieving = subscribers.forRecieving.filter(
+        (sub) => sub._id !== idToUnsubscribe,
+      );
+    if (actionType === 'send')
+      subscribers.forSending = subscribers.forSending.filter((sub) => sub._id !== idToUnsubscribe);
   };
 
   const close = () => {
@@ -31,8 +43,12 @@ const BroadcastInterfacePrototype = (channel: string, chats: UserChat[]): Broadc
     subscribers = null;
   };
 
-  const sentData = (data: Object) => {
+  const sentData = (data: BroadcastAnyMessage) => {
     bc.postMessage(data);
+    if (!subscribers) return null;
+    subscribers.forSending.forEach((sudcriber) => {
+      sudcriber.action(data);
+    });
   };
 
   return { subscribe, unsubscribe, close, sentData };
