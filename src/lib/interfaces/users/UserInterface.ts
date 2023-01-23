@@ -1,4 +1,4 @@
-import { UserInterfacePrototype } from './UserInterface.D';
+import { GetUsers, AddNewUser, UpdateUserData } from './UserInterface.D';
 import { User, UsersInStorage } from '../../../DataTypes/User/User.D';
 import validateUsersStorage from '../../validators/validateUsersStorage';
 import Drivers from '../../drivers';
@@ -11,11 +11,12 @@ import {
   GetUsersI,
 } from './lib/getUsers.D';
 import queryBy from './lib';
+import { StorageInterface } from '../../../DataTypes/StorageInterface.D';
 
-export class UserInterface extends UserInterfacePrototype {
+class UserInterface extends StorageInterface<GetUsers, AddNewUser, UpdateUserData> {
   private storageDriver: StorageDriverR<UsersInStorage>;
   private cache: UsersInStorage;
-    // the cache minus -> we don`t have mechanism to automatically validate data
+  // the cache minus -> we don`t have mechanism to automatically validate
 
   constructor() {
     super();
@@ -23,15 +24,15 @@ export class UserInterface extends UserInterfacePrototype {
     this.cache = {};
   }
 
-  private getAllUsers(): UsersInStorage {
+  private getAll(): UsersInStorage {
     return validateUsersStorage({
       users: this.storageDriver.getDataInStorage(),
       writeDataInStorage: this.storageDriver.writeDataInStorage,
     });
   }
 
-  getUsers = ({ query }: GetUsersI): GetUsersR => {
-    const users = this.getAllUsers();
+  getByQuery = ({ query }: GetUsersI): GetUsersR => {
+    const users = this.getAll();
 
     if (isQueryByLogin(query)) {
       if (this.cache[query.userLogin]) return this.cache[query.userLogin];
@@ -71,12 +72,12 @@ export class UserInterface extends UserInterfacePrototype {
     return null;
   };
 
-  addNewUser = ({ user }: { user: User }): User => {
+  addNew = ({ user }: { user: User }): User => {
     this.storageDriver.addDataInStorage({ newData: { [user._id]: user } });
     return user;
   };
 
-  updateUserData = ({ user }: { user: User }): User => {
+  updateData = ({ user }: { user: User }): User => {
     this.storageDriver.addDataInStorage({ newData: { [user._id]: user } });
     return user;
   };
