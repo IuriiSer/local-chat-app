@@ -13,12 +13,12 @@ export type BroadcastInterface = {
 export type Subscribe = (subscriber: BroadcastSubscriber) => void;
 export type BroadcastSubscriberID = string;
 
+export type Action = (data: BroadcastAnyMessage) => void;
+
 export enum ActionType {
   recieve = 'recieve',
   send = 'send',
 }
-
-export type Action = (data: BroadcastAnyMessage) => void;
 
 export type BroadcastSubscriber = {
   _id: BroadcastSubscriberID;
