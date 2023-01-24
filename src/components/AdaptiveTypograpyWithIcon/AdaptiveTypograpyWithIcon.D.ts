@@ -6,12 +6,12 @@ type ShortText = string;
 export interface AdaptiveTypograpyWithIconI {
   content: [FullText, ShortText];
   icon: JSX.Element;
-  resLimitTrigger: StyleTrigger;
+  resLimitTrigger: ResolutionTrigger;
   onClick?: () => void;
   variant?: TypographyVariant;
 }
 
-export enum StyleTrigger {
+export enum ResolutionTrigger {
   sm = 'sm',
   md = 'md',
   lg = 'lg',

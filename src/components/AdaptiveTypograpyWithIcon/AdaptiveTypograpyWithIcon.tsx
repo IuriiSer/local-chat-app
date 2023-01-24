@@ -3,6 +3,12 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import { AdaptiveTypograpyWithIconI } from './AdaptiveTypograpyWithIcon.D';
 
+/**
+ * Show full text for when special condition gives true
+ * And icon + short for false
+ * @param look AdaptiveTypograpyWithIcon.D for params
+ * @returns 
+ */
 const AdaptiveTypograpyWithIcon = ({
   content: [fullText, shortText],
   icon,
