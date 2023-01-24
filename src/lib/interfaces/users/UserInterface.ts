@@ -35,9 +35,7 @@ class UserInterface extends StorageInterface<GetUsers, AddNewUser, UpdateUserDat
     const users = this.getAll();
 
     if (isQueryByLogin(query)) {
-      if (this.cache[query.userLogin]) return this.cache[query.userLogin];
       const user = queryBy.login({ users: Object.values(users), userLogin: query.userLogin });
-      if (user) this.cache[query.userLogin] = user;
       return user;
     }
 
@@ -51,7 +49,8 @@ class UserInterface extends StorageInterface<GetUsers, AddNewUser, UpdateUserDat
         return false;
       });
       // 2 -> get notCachedUser from slow storadge
-      const notCachedUsers = queryBy.IDs({ users, userIDs: notCachedIDs });
+      const notCachedUsers =
+        (notCachedIDs.length && queryBy.IDs({ users, userIDs: notCachedIDs })) || [];
       // 3 -> save their data into cache
       notCachedUsers.forEach((user) => {
         this.cache[user._id] = user;
@@ -60,13 +59,14 @@ class UserInterface extends StorageInterface<GetUsers, AddNewUser, UpdateUserDat
     }
 
     if (isQueryByNickName(query)) {
-      if (this.cache[query.userNickName]) return this.cache[query.userNickName];
-      const user = queryBy.nickName({
+      const usersByNickName = queryBy.nickName({
         users: Object.values(users),
         userNickName: query.userNickName,
       });
-      if (user) this.cache[query.userNickName] = user;
-      return user;
+      usersByNickName.forEach((user) => {
+        this.cache[user._id] = user;
+      });
+      return usersByNickName;
     }
 
     return null;
@@ -78,6 +78,7 @@ class UserInterface extends StorageInterface<GetUsers, AddNewUser, UpdateUserDat
   };
 
   updateData = ({ user }: { user: User }): User => {
+    this.cache[user._id] = user;
     this.storageDriver.addDataInStorage({ newData: { [user._id]: user } });
     return user;
   };
