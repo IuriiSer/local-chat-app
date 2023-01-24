@@ -14,7 +14,7 @@ import { TransitionGroup } from 'react-transition-group';
 import Collapse from '@mui/material/Collapse';
 import Grow from '@mui/material/Grow';
 import AdaptiveTypograpyWithIcon from '../AdaptiveTypograpyWithIcon/AdaptiveTypograpyWithIcon';
-import { StyleTrigger } from '../AdaptiveTypograpyWithIcon/AdaptiveTypograpyWithIcon.D';
+import { ResolutionTrigger } from '../AdaptiveTypograpyWithIcon/AdaptiveTypograpyWithIcon.D';
 import KeyIcon from '@mui/icons-material/Key';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import InterchangeableText from '../InterchangeableText/InterchangeableText';
@@ -40,8 +40,6 @@ const Authorization = () => {
   const [open, setOpen] = useState<boolean>(true);
   const [formType, setFormType] = useState<FormType>(FormType.signin);
   const [errors, setErrors] = useState<ParsedError>({});
-
-  console.log('Authorization Render');
 
   useEffect(() => {
     if (!isAuthorizate) setOpen(true);
@@ -208,7 +206,7 @@ const Authorization = () => {
                     <AdaptiveTypograpyWithIcon
                       content={['Already have an account?', 'Sign In']}
                       icon={<KeyIcon />}
-                      resLimitTrigger={StyleTrigger.sm}
+                      resLimitTrigger={ResolutionTrigger.sm}
                       onClick={changeFormType}
                       variant='button'
                     />
@@ -220,7 +218,7 @@ const Authorization = () => {
                     <AdaptiveTypograpyWithIcon
                       content={["Don't have an account?", 'Sign Up']}
                       icon={<PersonAddIcon />}
-                      resLimitTrigger={StyleTrigger.sm}
+                      resLimitTrigger={ResolutionTrigger.sm}
                       onClick={changeFormType}
                       variant='button'
                     />
