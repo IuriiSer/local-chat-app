@@ -26,8 +26,10 @@ const signupPrototype =
         message: UserServiceMessage.wrongInput,
       };
 
-    addUser({ user });
     setUser(user);
+    delete user.passwordRepeat;
+    delete user.newUser;
+    addUser({ user });
     return { status: UserServiceStatus.ok };
   };
 
