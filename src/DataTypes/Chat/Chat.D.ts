@@ -1,5 +1,6 @@
 import { UserID } from '../User/User.D';
 import { MessageID } from '../Message/Message.D';
+import { DataInStoradge } from '../StorageInterface.D';
 
 export type ChatID = string;
 
@@ -13,8 +14,6 @@ export type Chat = {
   owner: UserID;
 };
 
-export type ChatInStorage = ChatsCache
+export type ChatInStorage = DataInStoradge<Chat>
 
-export type ChatsCache = {
-  [key: ChatID]: Chat;
-};
+export type ChatsCache = DataInStoradge<Chat>
