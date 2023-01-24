@@ -5,4 +5,4 @@ export interface UserByNickNameI {
 	userNickName: UserNickName;
 }
 
-export type UserByNickNameR = User | null;
+export type UserByNickNameR = User[];
