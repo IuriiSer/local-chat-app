@@ -10,3 +10,7 @@ export abstract class StorageInterface<G, U, A> {
   abstract eraseCache: () => void;
   // method to erase cache
 }
+
+export type DataInStoradge<K> = {
+  [key: string]: K
+}
