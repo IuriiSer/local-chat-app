@@ -22,11 +22,16 @@ class ChatInterface extends StorageInterface<GetChats, AddNewChat, UpdateChatDat
   getByQuery = (query: ChatQuery): Chat[] | null => {
     const chats = this.getAll();
     const res = [] as Chat[];
-    query.chatIDs.forEach((chatID) => {
-      const chat = chats[chatID];
-      if (chat) res.push(chat);
-    });
-    return (res.length && res) || null;
+
+    if (query.chatIDs) {
+      query.chatIDs.forEach((chatID) => {
+        const chat = chats[chatID];
+        if (chat) res.push(chat);
+      });
+      return (res.length && res) || null;
+    }
+
+    return null;
   };
 
   addNew = (chat: Chat): Chat => {
