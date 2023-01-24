@@ -1,20 +1,19 @@
-import { Chat, ChatID } from '../../DataTypes/Chat/Chat.D';
-import { UserID } from '../../DataTypes/User/User.D';
-import { Action, ActionType } from '../../lib/interfaces/broadcastChannel/BroadcastInterface.D';
-
-export type useMessageService = {};
+import { ChatID } from '../../DataTypes/Chat/Chat.D';
+import { UserChatExtended, UserID } from '../../DataTypes/User/User.D';
 
 export enum ChatServiceStatus {
   online = 'online',
   offline = 'offline',
 }
 
+export interface GetChatsI {
+  checkInStoradge?: boolean;
+}
+
 export type UseChatService = {
   activeChatID: ChatID | null;
-  chatServiceStatus: ChatServiceStatus;
   setActiveChatID: (chatID: ChatID) => void;
-  getChats: () => Chat[] | null;
-  useSubscribe: (action: Action, actionType: ActionType) => void;
+  getChats: (args?: GetChatsI) => UserChatExtended[] | null;
   createNewChat: (toUserID: UserID) => void;
   exitFromChat: (chatID: ChatID) => void;
 };
