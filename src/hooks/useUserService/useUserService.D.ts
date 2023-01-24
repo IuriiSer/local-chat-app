@@ -32,14 +32,16 @@ export type UserServiceResponce = ServiceResponce<
 
 export type Signup = (newUser: NewUser) => UserServiceResponce;
 export type Signin = ({ login, password }: LoginI) => UserServiceResponce;
+export type UpdateCurrentUser = (newData: UserDataToUpdate) => UserServiceResponce;
 
 export type UseUserService = {
   authorizedUser: User | null;
   signup: Signup;
-  update: (newData: UserDataToUpdate) => UserServiceResponce;
+  update: UpdateCurrentUser;
   logout: () => void;
   signin: Signin;
   getUsers: ({ query }: GetUsersI) => UserOpenData | UserOpenData[] | null;
+  updateUserState: () => void;
 };
 
 export type SetUserState = React.Dispatch<React.SetStateAction<User | null>>;
