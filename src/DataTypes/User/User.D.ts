@@ -1,6 +1,8 @@
 import { version as uuidVersion, validate as uuidValidate } from 'uuid';
-import { ChatID } from '../Chat/Chat.D';
+import { Chat, ChatID } from '../Chat/Chat.D';
 import { DataFormatError } from '../Errors.D';
+import { MessageID } from '../Message/Message.D';
+import { DataInStoradge } from '../StorageInterface.D';
 
 export type UserID = string;
 // standart ID
@@ -14,14 +16,21 @@ export type UserChat = {
   _id: ChatID;
   // chat id the user take apart
   lastSeen: Date;
-  // lastseen time need to show a count of unreaded messages
+  // lastseen time
+  lastReadedMessageID?: MessageID
+  // need to show a count of unreaded messages
+  chat?: Chat;
+  // chat data can be implemented in chat service
 };
+
+export  type UserChatExtended = UserChat & Required<Pick<UserChat, 'chat'>>;
 
 export type User = {
   _id: UserID;
   login: UserLogin;
   nickName: UserNickName;
   password: UserPassword;
+  passwordRepeat?: UserPassword;
   chats: UserChat[];
   newUser?: boolean;
 };
@@ -35,7 +44,7 @@ export type UserDataToUpdate = Partial<Omit<User, '_id' | 'chats'>>;
 export type UserOpenData = Omit<User, 'password' | 'chats' | 'session' | 'login'>;
 // open user data that can be showed in front
 
-export type UsersInStorage = { [key: UserID]: User };
+export type UsersInStorage = DataInStoradge<User>;
 // representaion of user in localStorage
 // why object ->
 // localStorage is slow and we will often send request to get UserOpenData
@@ -47,9 +56,9 @@ export type UsersInStorage = { [key: UserID]: User };
 // in requested format. We don`t need every time format in default server/client schema
 // but in this task it was necessary
 // THE MOST validators are simple and just check do toCheck contains requerid fields
-export const isUser = (toCheck: any, requiredFields: string[] | null): toCheck is User => {
+export const isUser = (toCheck: any, requiredFields: string[]): toCheck is User => {
   if (typeof (toCheck as User) !== 'object') return false;
-  return !!!requiredFields?.some((field) => !toCheck[field]);
+  return !requiredFields.some((field) => !toCheck[field]);
 };
 
 export const isUsersInStorage = (toCheck: any): toCheck is UsersInStorage => {
@@ -65,7 +74,7 @@ export const isUserNickName = (toCheck: string): toCheck is UserNickName => {
 export const isUserID = (toCheck: string): toCheck is UserID => {
   const idValidator = getFieldValidator('isTrueID');
   if (!idValidator) return false;
-  return !!idValidator.validate({ _id: toCheck } as User);
+  return !!!idValidator.validate({ _id: toCheck } as User);
 };
 
 /* FIELDS ERRORS */
@@ -75,7 +84,7 @@ export enum UserFieldsErrorDescription {
   wrongId = 'Wrong ID format',
   emptyLogin = 'Login is empty',
   wrongLogin = 'Login should starts with @ and contain a-z, 0-9, -, _',
-  loginIsBusy = 'loginIsBusy',
+  loginIsBusy = 'Lofin is busy',
   emptyNickName = 'NickName is empty',
   wrongNickName = 'NickName should contain a-z, 0-9, .',
   emptyPassword = 'Password is empty',
