@@ -6,7 +6,7 @@ const userByIDs = ({ users, userIDs }: UsersByIDsI): UsersByIDsR => {
 	
 	userIDs.forEach((id) => {
 		if (!isUserID(id)) return;
-		if (isUser(users[id], ['id', 'nickname'])) res.push(users[id]);
+		if (isUser(users[id], ['_id', 'nickName'])) res.push(users[id]);
 	});
 	
 	return res;
