@@ -1,22 +1,55 @@
-import React, { useContext } from 'react';
+import React, { useContext, memo } from 'react';
 import { useTheme } from '@mui/material/styles';
 import ListItem from '@mui/material/ListItem';
 import Grid from '@mui/material/Grid';
 import UserAvatar from '../UserAvatar/UserAvatar';
 import Typography from '@mui/material/Typography';
 import { ChatPreviewI } from './ChatPreview.D';
+import AppContext from '../AppContext/AppContext';
+import _ from 'lodash';
 
-const ChatPreview = ({ chat, lastSeen }: ChatPreviewI) => {
-  const unreadedMessageCount = 1000;
+const ChatPreview = ({ chat , messages }: ChatPreviewI) => {
   const theme = useTheme();
+  const {
+    chatService: { activeChatID, setActiveChatID },
+    userService: { getUsers, authorizedUser },
+  } = useContext(AppContext);
+
+  const { chat: chatData } = chat;
+  if (!chatData || !authorizedUser) return <></>;
+
+  // Get user data for chat
+  const { users } = chatData;
+  const usersInChat = _.difference(users, [authorizedUser._id]);
+  const userData = getUsers({ query: { userIDs: usersInChat } });
+
+  // get nickName to show in badge
+  let userNickName = null as string | null;
+  if (Array.isArray(userData) && userData.length) userNickName = userData[0].nickName;
+  if (userData && !Array.isArray(userData)) userNickName = userData.nickName;
+
+  // set bgColor for active chat
+  const bgcolor = (activeChatID === chat._id && 'primary.main') || '';
+
+  // get unreadedMessageCount 
+  const unreadedMessageCount = chat.lastReadedMessageID
+    ? messages.length - messages.findIndex((messageID) => messageID === chat.lastReadedMessageID)
+    : messages.length;
+
   return (
-    <ListItem>
-      <Grid container columns={3} sx={{ gap: theme.spacing(1), alignItems: 'center' }}>
+    <ListItem sx={{ bgcolor }} onClick={() => setActiveChatID(chat._id)}>
+      <Grid
+        container
+        columns={3}
+        sx={{
+          gap: theme.spacing(1),
+          alignItems: 'center',
+        }}>
         <Grid item>
-          <UserAvatar nickName={'sdad'} />
+          <UserAvatar nickName={userNickName || authorizedUser.nickName} />
         </Grid>
         <Grid item sx={{ flexGrow: 1 }}>
-          {'User Nickname'}
+          {userNickName || authorizedUser.nickName}
         </Grid>
         <Grid
           item
@@ -26,7 +59,9 @@ const ChatPreview = ({ chat, lastSeen }: ChatPreviewI) => {
             borderRadius: theme.spacing(1),
           }}>
           <Typography variant='body2' sx={{ lineHeight: 1 }}>
-            {unreadedMessageCount > 100 ? '+99' : unreadedMessageCount}
+            {Boolean(unreadedMessageCount) &&
+              (unreadedMessageCount > 100 ? '+99' : unreadedMessageCount)}
+            {!Boolean(unreadedMessageCount) && 'NEW'}
           </Typography>
         </Grid>
       </Grid>

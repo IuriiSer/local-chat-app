@@ -1,6 +1,7 @@
-import { Chat } from '../../DataTypes/Chat/Chat.D';
+import { MessageID } from '../../DataTypes/Message/Message.D';
+import { UserChat } from '../../DataTypes/User/User.D';
 
 export interface ChatPreviewI {
-  chat: Chat;
-  lastSeen: Date;
+  chat: UserChat;
+  messages: MessageID[]
 }
