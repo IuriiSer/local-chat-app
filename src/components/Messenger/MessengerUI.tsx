@@ -6,7 +6,7 @@ import ChatSideBarManager from '../ChatSideBarManager/ChatSideBarManager';
 import ChatWindow from '../ChatWindow/ChatWindow';
 import { UserChatExtended } from '../../DataTypes/User/User.D';
 import { Message } from '../../DataTypes/Message/Message.D';
-import { SetMessage } from '../../hooks/useActiveChatManager';
+import { SentMessage, SentMessageReaction } from '../../hooks/useActiveChatManager';
 
 const Main = styled('main')(({ theme }) => ({
   width: '100%',
@@ -28,10 +28,11 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 interface MessengerUII {
   chatsData: UserChatExtended[];
   messages: Message[];
-  setMessages: SetMessage;
+  sentMessage: SentMessage;
+  sentMessageReaction: SentMessageReaction;
 }
 
-export default function MessengerUI({ chatsData, messages, setMessages }: MessengerUII) {
+export default function MessengerUI({ chatsData, messages, sentMessage, sentMessageReaction }: MessengerUII) {
   const [open, setOpen] = React.useState(true);
 
   const handleDrawerOpen = () => {
@@ -48,7 +49,7 @@ export default function MessengerUI({ chatsData, messages, setMessages }: Messen
       <ChatSideBarManager chatsData={chatsData} open={open} handleDrawerClose={handleDrawerClose} />
       <Main>
         <DrawerHeader />
-        <ChatWindow messages={messages} setMessages={setMessages} />
+        <ChatWindow messages={messages} sentMessage={sentMessage} sentMessageReaction={sentMessageReaction}/>
       </Main>
     </Box>
   );
