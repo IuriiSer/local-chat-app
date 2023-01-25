@@ -29,4 +29,6 @@ export type Message = {
   // sent date
 };
 
+export type MessageMetafields = Omit<Message, '_id' | 'data' | 'owner' | 'sentDate'>;
+
 export type MessageInStorage = DataInStoradge<Message>;
