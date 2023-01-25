@@ -25,10 +25,10 @@ const ChatSearch = () => {
   const [isSearchActive, setIsSearchActive] = useState<boolean>(false);
   const searchTimeoutRef = useRef<null | NodeJS.Timeout>(null);
   
-  const setChatSearchActivity = (newVal: boolean) => {
+  const setChatSearchActivity = useCallback((newVal: boolean) => {
     if (newVal === isSearchActive) return;
     setIsSearchActive(newVal);
-  };
+  }, [isSearchActive]);
   
   /**
    * Make request to search by using user serice
@@ -52,7 +52,7 @@ const ChatSearch = () => {
     if (searchResults.length) setSearchResults([]);
     if (isLoadingData) setIsLoadingData(false);
     setChatSearchActivity(false);
-  }, [searchResults, isLoadingData, setChatSearchActivity]);
+  }, [nickNameQuery.length, searchResults.length, isLoadingData, setChatSearchActivity]);
 
   /**
    * Logic to controll input data from text-input
@@ -104,7 +104,7 @@ const ChatSearch = () => {
           </Collapse>
         )}
       </TransitionGroup>
-      <Grid container p={1} gap={1}>
+      <Grid container p={1}>
         <TransitionGroup>
           {Boolean(searchResults.length) &&
             searchResults.map((user) => (
