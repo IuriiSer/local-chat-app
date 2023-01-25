@@ -14,10 +14,15 @@ const Messanger = () => {
 };
 
 const AddActiveChatManager = ({ chatsData }: { chatsData: UserChatExtended[] }) => {
-  const { messages, setMessages } = useActiveChatManager();
+  const { messages, sentMessage, sentMessageReaction } = useActiveChatManager();
   return (
     <>
-      <MessengerUI chatsData={chatsData} messages={messages} setMessages={setMessages} />
+      <MessengerUI
+        chatsData={chatsData}
+        messages={messages}
+        sentMessage={sentMessage}
+        sentMessageReaction={sentMessageReaction}
+      />
     </>
   );
 };
