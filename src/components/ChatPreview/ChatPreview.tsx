@@ -8,9 +8,10 @@ import { ChatPreviewI } from './ChatPreview.D';
 import AppContext from '../AppContext/AppContext';
 import _ from 'lodash';
 
-const ChatPreview = ({ chat , messages }: ChatPreviewI) => {
+const ChatPreview = ({ chat, messages }: ChatPreviewI) => {
   const theme = useTheme();
   const {
+    messageService: { getMessage },
     chatService: { activeChatID, setActiveChatID },
     userService: { getUsers, authorizedUser },
   } = useContext(AppContext);
@@ -18,20 +19,23 @@ const ChatPreview = ({ chat , messages }: ChatPreviewI) => {
   const { chat: chatData } = chat;
   if (!chatData || !authorizedUser) return <></>;
 
+  // ! ADD logic what to show
   // Get user data for chat
   const { users } = chatData;
   const usersInChat = _.difference(users, [authorizedUser._id]);
   const userData = getUsers({ query: { userIDs: usersInChat } });
 
   // get nickName to show in badge
-  let userNickName = null as string | null;
+  let userNickName = authorizedUser.nickName;
   if (Array.isArray(userData) && userData.length) userNickName = userData[0].nickName;
   if (userData && !Array.isArray(userData)) userNickName = userData.nickName;
+
+  userNickName = userNickName.length > 16 ? `${userNickName.slice(0, 14)}...` : userNickName;
 
   // set bgColor for active chat
   const bgcolor = (activeChatID === chat._id && 'primary.main') || '';
 
-  // get unreadedMessageCount 
+  // get unreadedMessageCount
   const unreadedMessageCount = chat.lastReadedMessageID
     ? messages.length - messages.findIndex((messageID) => messageID === chat.lastReadedMessageID)
     : messages.length;
@@ -46,10 +50,10 @@ const ChatPreview = ({ chat , messages }: ChatPreviewI) => {
           alignItems: 'center',
         }}>
         <Grid item>
-          <UserAvatar nickName={userNickName || authorizedUser.nickName} />
+          <UserAvatar nickName={userNickName} />
         </Grid>
         <Grid item sx={{ flexGrow: 1 }}>
-          {userNickName || authorizedUser.nickName}
+          {userNickName}
         </Grid>
         <Grid
           item
@@ -69,4 +73,4 @@ const ChatPreview = ({ chat , messages }: ChatPreviewI) => {
   );
 };
 
-export default ChatPreview;
+export default memo(ChatPreview);
