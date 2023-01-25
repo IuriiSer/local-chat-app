@@ -1,43 +1,85 @@
-import React, { useContext, useState, useEffect, ChangeEvent, useCallback } from 'react';
+import React, { useContext, useState, useEffect, ChangeEvent, useRef, useCallback } from 'react';
 import Grid from '@mui/material/Grid';
 import { Divider, Typography, useTheme } from '@mui/material';
 import AppContext from '../AppContext/AppContext';
-import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import TextAreaWithAdorment from '../TextAreaWithAdorment/TextAreaWithAdorment';
 import NearMeIcon from '@mui/icons-material/NearMe';
-import { Message } from '../../DataTypes/Message/Message.D';
+import { Message, MessageID } from '../../DataTypes/Message/Message.D';
 import MessageDrawer from '../MessageDrawer/MessageDrawer';
-import { SetMessage } from '../../hooks/useActiveChatManager';
+import { SentMessage, SentMessageReaction } from '../../hooks/useActiveChatManager';
+import MessageReactionPeaker from '../MessageReactionPeaker/MessageReactionPeaker';
+import { EmojiClickData } from 'emoji-picker-react';
+import { Unified } from '../../DataTypes/Message/MessageReaction.D';
+import scrollToElementByID from '../../lib/helpers/scrollToElementByID';
 
 interface ChatWindowI {
   messages: Message[];
-  setMessages: SetMessage;
+  sentMessage: SentMessage;
+  sentMessageReaction: SentMessageReaction;
 }
 
-const ChatWindow = ({ messages, setMessages }: ChatWindowI) => {
+const ChatWindow = ({ messages, sentMessage, sentMessageReaction }: ChatWindowI) => {
   const theme = useTheme();
   const {
-    messageService: { addMessage: sentMessage },
+    userService: { authorizedUser },
     chatService: { activeChatID },
   } = useContext(AppContext);
+  const [typedMessage, setTypedMessage] = useState<string>('');
+  const [isReactionDialogOpen, setIsReactionDialogOpen] = useState<boolean>(false);
+  const [messageIdToReply, setMessageIdToReply] = useState<MessageID | undefined>(undefined);
+  const messageIdForNewReaction = useRef<null | MessageID>(null);
 
-  const [typedText, setTypedText] = useState<string>('');
+  // handle to sent messages
+  const sentMessageHandler = () => {
+    sentMessage(typedMessage, { repliedMessage: messageIdToReply });
+    setTypedMessage('');
+  };
 
-  const sentMessageHandler = useCallback(() => {
-    if (!activeChatID) return;
-    if (!typedText.trim()) return;
-    const newMessage = sentMessage(activeChatID, typedText.trim());
-    if (!newMessage) return;
-    setMessages((prev) => [...prev, newMessage]);
-    setTypedText('');
-  }, [sentMessage, activeChatID, typedText, setMessages]);
+  // handle to sent reaction
+  const sentMessageReactionHandler = (emojiID: Unified) => {
+    if (!messageIdForNewReaction.current) return;
+    sentMessageReaction(emojiID, messageIdForNewReaction.current);
+    messageIdForNewReaction.current = null;
+  };
 
+  // scroll for new message
   useEffect(() => {
-    const element = document.getElementById(messages.at(-1)?._id || '');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    const lastMessageID = messages.at(-1)?._id || '';
+    if (!lastMessageID) return;
+    scrollToElementByID(lastMessageID);
   }, [messages]);
+
+  // Logic to manage dialogs for Reactions
+  // BEGIN
+  const onEmojiReactionDialogPick = (emoji: EmojiClickData) => {
+    sentMessageReactionHandler(emoji.unified);
+    setIsReactionDialogOpen(false);
+  };
+
+  const openDialogToPeakReaction = useCallback((messageID: MessageID) => {
+    messageIdForNewReaction.current = messageID;
+    setIsReactionDialogOpen(true);
+  }, []);
+
+  const closeDialogToPeakReaction = () => {
+    messageIdForNewReaction.current = null;
+    setIsReactionDialogOpen(false);
+  };
+  // END
+
+  // Logic to manage reply ID
+  const setMessageIdToReplyHandle = useCallback(
+    (messageID: MessageID) => {
+      if (messageID === messageIdToReply) return;
+      setMessageIdToReply(messageID);
+    },
+    [messageIdToReply],
+  );
+
+  const resetMessageIdToReplyHandle = useCallback(() => {
+    setMessageIdToReply(undefined);
+  }, []);
+  // END
 
   if (!activeChatID)
     return (
@@ -52,48 +94,61 @@ const ChatWindow = ({ messages, setMessages }: ChatWindowI) => {
     );
 
   return (
-    <Grid
-      container
-      direction='column-reverse'
-      sx={{
-        padding: theme.spacing(1),
-        flexGrow: 1,
-        gap: theme.spacing(1),
-        height: '100%',
-        overflow: 'hidden',
-        flexWrap: 'nowrap',
-      }}>
-      {/* SNET Button */}
-      <Grid item>
-        <TextAreaWithAdorment
-          label='Type a message'
-          fieldKey='message'
-          value={typedText}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            setTypedText(e.target.value);
-          }}
-          actionCallBacks={[sentMessageHandler, () => {}]}>
-          <NearMeIcon />
-          <InsertEmoticonIcon />
-        </TextAreaWithAdorment>
-      </Grid>
-      <Divider />
+    <>
+      <MessageReactionPeaker
+        open={isReactionDialogOpen}
+        onEmojiClick={onEmojiReactionDialogPick}
+        onClose={closeDialogToPeakReaction}
+      />
       <Grid
         container
-        direction='column'
+        direction='column-reverse'
         sx={{
-          paddingBottom: theme.spacing(1),
+          padding: theme.spacing(1),
+          flexGrow: 1,
           gap: theme.spacing(1),
-          overflowY: 'auto',
+          height: '100%',
+          overflow: 'hidden',
           flexWrap: 'nowrap',
         }}>
-        {messages.map((message) => (
-          <Grid item key={message._id}>
-            <MessageDrawer {...message} />
-          </Grid>
-        ))}
+        {/* SNET Button */}
+        <Grid item>
+          <TextAreaWithAdorment
+            label='Type a message'
+            fieldKey='message'
+            value={typedMessage}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setTypedMessage(e.target.value);
+            }}
+            actionCallBacks={[sentMessageHandler]}>
+            <NearMeIcon />
+          </TextAreaWithAdorment>
+        </Grid>
+        <Divider />
+        <Grid
+          container
+          direction='column'
+          sx={{
+            paddingBottom: theme.spacing(1),
+            gap: theme.spacing(1),
+            overflowY: 'auto',
+            flexWrap: 'nowrap',
+          }}>
+          {messages.map((message) => (
+            <Grid
+              item
+              key={message._id}
+              alignSelf={authorizedUser?._id === message.owner ? 'flex-end' : 'flex-start'}>
+              <MessageDrawer
+                {...message}
+                openDialogToPeakReaction={openDialogToPeakReaction}
+                setMessageIdToReply={setMessageIdToReplyHandle}
+              />
+            </Grid>
+          ))}
+        </Grid>
       </Grid>
-    </Grid>
+    </>
   );
 };
 
