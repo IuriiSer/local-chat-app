@@ -15,13 +15,21 @@ interface ChatSearchUserBadgeI {
  */
 const ChatSearchUserBadge = ({ user, onClick }: ChatSearchUserBadgeI) => {
   const theme = useTheme();
+
+  const nickNameToShow =
+    user.nickName.length > 16 ? `${user.nickName.slice(0, 13)}...` : user.nickName;
+
   return (
-    <Grid onClick={() => onClick(user)} container sx={{ gap: theme.spacing(1), alignItems: 'center' }}>
+    <Grid
+      onClick={() => onClick(user)}
+      container
+      mb={theme.spacing(1)}
+      sx={{ gap: theme.spacing(1), alignItems: 'center' }}>
       <Grid item>
         <UserAvatar nickName={user.nickName} />
       </Grid>
       <Grid item sx={{ flexGrow: 1 }}>
-        {user.nickName}
+        {nickNameToShow}
       </Grid>
     </Grid>
   );
