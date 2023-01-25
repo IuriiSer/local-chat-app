@@ -89,16 +89,12 @@ const useActiveChatManager = (): UseActiveChatManager => {
       const message = messagesCloned.find(
         (messageInState) => messageInState._id === data.content.messageID,
       );
-
-      console.log('file: useActiveChatManager.ts:91 ~ message', message);
-
       if (!message) return;
       const newReaction = {
         emojiID: data.content.reaction.emojiID,
         userID: data.content.reaction.userID,
       };
       getUpdatedMessageForNewReaction(message, newReaction);
-      console.log('file: useActiveChatManager.ts:102 ~ message', message);
       setMessages(messagesCloned);
     },
     [messages],

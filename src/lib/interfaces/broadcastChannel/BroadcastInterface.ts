@@ -25,9 +25,6 @@ const BroadcastInterfacePrototype = (channel: string): BroadcastInterface => {
   const subscribe = (subscriber: BroadcastSubscriber): void => {
     if (subscriber.actionType === 'recieve') subscribers.forRecieving.push(subscriber);
     if (subscriber.actionType === 'send') subscribers.forSending.push(subscriber);
-    console.group('BroadcastInterface -> Subscriber');
-    console.log('subscriber', subscriber);
-    console.groupEnd();
   };
 
   const unsubscribe = ({ idToUnsubscribe, actionType }: UnsubscribeI): void => {
@@ -37,11 +34,6 @@ const BroadcastInterfacePrototype = (channel: string): BroadcastInterface => {
       );
     if (actionType === 'send')
       subscribers.forSending = subscribers.forSending.filter((sub) => sub._id !== idToUnsubscribe);
-
-    console.group('BroadcastInterface -> Unsubscribe');
-    console.log('actionType', actionType);
-    console.log('idToUnsubscribe', idToUnsubscribe);
-    console.groupEnd();
   };
 
   const close = () => {
