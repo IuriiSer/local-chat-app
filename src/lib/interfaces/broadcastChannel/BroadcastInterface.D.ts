@@ -62,10 +62,10 @@ type MessageHasEditedContent = {
   messageData: MessageData;
 };
 
-type MessageGetReactionContent = {
+export type MessageGetReactionContent = {
   chatID: ChatID;
   messageID: MessageID;
-  Reaction: MessageNewReaction;
+  reaction: MessageNewReaction;
 };
 
 type InvitedToChatContent = {
