@@ -29,9 +29,15 @@ const ChatWindow = ({ messages, sentMessage, sentMessageReaction }: ChatWindowI)
   const [messageIdToReply, setMessageIdToReply] = useState<MessageID | undefined>(undefined);
   const messageIdForNewReaction = useRef<null | MessageID>(null);
 
+  useEffect(() => {
+    if (!messageIdToReply) return;
+    resetMessageIdToReplyHandle();
+  }, [activeChatID]);
+
   // handle to sent messages
   const sentMessageHandler = () => {
     sentMessage(typedMessage, { repliedMessage: messageIdToReply });
+    setMessageIdToReply(undefined);
     setTypedMessage('');
   };
 
