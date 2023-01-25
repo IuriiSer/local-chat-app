@@ -31,11 +31,6 @@ const useActiveChatManager = (): UseActiveChatManager => {
 
   const [messages, setMessages] = useState<Message[]>([] as Message[]);
 
-  useEffect(() => {
-    console.log('file: ChatWindow.tsx:37 ~ messages', messages);
-  }, [messages]);
-
-
   // update message for new active chat
   useEffect(() => {
     if (!authorizedUser || !activeChatID) {
