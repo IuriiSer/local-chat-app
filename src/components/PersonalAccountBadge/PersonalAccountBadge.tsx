@@ -11,14 +11,20 @@ const PersonalAccountBadge = () => {
     userService: { authorizedUser, logout },
   } = useContext(AppContext);
   const theme = useTheme();
-  if (!authorizedUser?.nickName) return <></>;
+  if (!authorizedUser) return <></>;
+
+  const nickNameToShow =
+    authorizedUser.nickName.length > 10
+      ? `${authorizedUser.nickName.slice(0, 7)}...`
+      : authorizedUser.nickName;
+
   return (
     <Grid container sx={{ gap: theme.spacing(1), alignItems: 'center' }}>
       <Grid item>
         <UserAvatar nickName={authorizedUser.nickName} />
       </Grid>
       <Grid item sx={{ flexGrow: 1 }}>
-        {authorizedUser.nickName}
+        {nickNameToShow}
       </Grid>
       <Grid item>
         <IconButton onClick={logout}>
