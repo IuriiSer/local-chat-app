@@ -96,7 +96,7 @@ const useChatService = (
       updateUserState();
       setActiveChatID(newChat._id);
     },
-    [user, sentData],
+    [user, getChats, sentData, updateUserState, setActiveChatID],
   );
 
   const exitFromChat = useCallback(
@@ -113,7 +113,7 @@ const useChatService = (
 
       updateUserState();
     },
-    [user],
+    [updateUserState, user],
   );
 
   return {
