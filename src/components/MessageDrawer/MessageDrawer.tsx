@@ -17,7 +17,7 @@ type MessageDraweI = Message & MenuManagment;
 
 const MessageContainer = styled(Paper)<PaperProps>(({ theme }) => ({
   maxWidth: 300,
-  maxHeight: 300,
+  overflow: 'hidden',
 }));
 
 const MessageDrawer = ({
