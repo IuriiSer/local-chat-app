@@ -80,8 +80,8 @@ export const isUserID = (toCheck: string): toCheck is UserID => {
 /* FIELDS ERRORS */
 // Errors codes
 export enum UserFieldsErrorDescription {
-  emptyId = 'Empty ID',
-  wrongId = 'Wrong ID format',
+  emptyID = 'Empty ID',
+  wrongID = 'Wrong ID format',
   emptyLogin = 'Login is empty',
   wrongLogin = 'Login should starts with @ and contain a-z, 0-9, -, _',
   loginIsBusy = 'Lofin is busy',
@@ -124,9 +124,9 @@ const userFieldValidators: UserFieldValidator[] = [
     validate(user: User): UserFieldError | null {
       const { _id } = user;
       const field = '_id';
-      if (!_id) return { field, err: UserFieldsErrorDescription.emptyId };
-      if (!uuidValidate(_id)) return { field, err: UserFieldsErrorDescription.wrongId };
-      if (uuidVersion(_id) !== 4) return { field, err: UserFieldsErrorDescription.wrongId };
+      if (!_id) return { field, err: UserFieldsErrorDescription.emptyID };
+      if (!uuidValidate(_id)) return { field, err: UserFieldsErrorDescription.wrongID };
+      if (uuidVersion(_id) !== 4) return { field, err: UserFieldsErrorDescription.wrongID };
       return null;
     },
   },
