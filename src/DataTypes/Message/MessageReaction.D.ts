@@ -1,16 +1,16 @@
 import { UserID } from '../User/User.D';
 
-type EmojiID = string;
+export type Unified = string;
 
 export type MessageReaction = {
-  emoji: EmojiID;
+  emojiID: Unified;
   // the emoji ID
   users: UserID[];
   // users IDs who leavs the reaction
 };
 
 export type MessageNewReaction = {
-  emoji: EmojiID;
+  emojiID: Unified;
   // the emoji ID
   userID: UserID;
   // the user who leave the Reaction
