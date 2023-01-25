@@ -3,12 +3,14 @@ import { ChatID } from '../../DataTypes/Chat/Chat.D';
 import { User } from '../../DataTypes/User/User.D';
 import Interfaces from '../../lib/interfaces';
 import { v4 as uuidv4 } from 'uuid';
-import { Message, MessageID } from '../../DataTypes/Message/Message.D';
+import { Message, MessageID, MessageMetafields } from '../../DataTypes/Message/Message.D';
 import {
   BroadcastAnyMessage,
   BroadcastEents,
+  MessageGetReactionContent,
 } from '../../lib/interfaces/broadcastChannel/BroadcastInterface.D';
 import { UseMessageService } from './useMessageService.D';
+import { MessageNewReaction } from '../../DataTypes/Message/MessageReaction.D';
 
 const useMessageService = (
   user: User | null,
@@ -37,8 +39,8 @@ const useMessageService = (
     [user],
   );
 
-  const addMessage = useCallback(
-    (chatID: string, messageText: string): Message | null => {
+  const sentMessage = useCallback(
+    (chatID: string, messageText: string, extraData?: MessageMetafields): Message | null => {
       if (!user || !sentData) return null;
       if (!user.chats.some((chat) => chat._id === chatID)) return null;
       const newMessage = {
@@ -48,6 +50,7 @@ const useMessageService = (
         sentDate: new Date(),
       } as Message;
       newMessage.data = { text: messageText };
+      if (extraData) Object.assign(newMessage, extraData);
       const chatToModify = Interfaces.chat.getByQuery({ chatIDs: [chatID] });
       if (!Array.isArray(chatToModify) || !chatToModify.length) return null;
       const [chat] = chatToModify;
@@ -59,9 +62,24 @@ const useMessageService = (
     [user, sentData],
   );
 
-  const updateMessage = useCallback(() => {}, []);
+  const sentReaction = useCallback(
+    (chatID: string, message: Message, reaction: MessageNewReaction): void => {
+      if (!user || !sentData) return;
+      if (!user.chats.some((chat) => chat._id === chatID)) return;
+      const content = {
+        chatID,
+        messageID: message._id,
+        reaction,
+      } as MessageGetReactionContent;
 
-  return { getMessages, getMessage, addMessage };
+      Interfaces.message.updateData(message);
+      sentData({ event: BroadcastEents.messageGetReaction, content });
+      return;
+    },
+    [user, sentData],
+  );
+
+  return { getMessages, getMessage, sentMessage, sentReaction };
 };
 
 export default useMessageService;
